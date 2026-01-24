@@ -1,0 +1,14 @@
+# Binaires
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+
+# Dépendances
+vendor/
+
+# IDE
+.vscode/
+.idea/
