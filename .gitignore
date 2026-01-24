@@ -1,3 +1,8 @@
+.local/
+*.crt
+*.key
+*.pem
+
 # Binaires
 *.exe
 *.exe~
