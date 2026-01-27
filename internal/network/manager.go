@@ -9,5 +9,4 @@ import (
 func RegisterHandlers(mux *http.ServeMux) {
 
 	mux.HandleFunc("/hello", handlers.SayHello)
-	mux.HandleFunc("/create-client", handlers.CreateClient)
 }

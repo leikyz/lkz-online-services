@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/leikyz/lkz-online-services/internal/models"
+	client "github.com/leikyz/lkz-online-services/internal/clients"
 )
 
 func SayHello(w http.ResponseWriter, r *http.Request) {
@@ -27,6 +27,8 @@ func SayHello(w http.ResponseWriter, r *http.Request) {
 	messageID := body[0]
 	fmt.Printf("Message received ! ID: %d | Size: %d bytes\n", messageID, len(body))
 
+	newPlayer := client.ClientManager.CreateClient("guest", 1)
+
 	responseID := byte(1)
 	w.Header().Set("Content-Type", "application/octet-stream")
 
@@ -35,15 +37,6 @@ func SayHello(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println("Error writing response:", err)
 	} else {
-		fmt.Printf("Response sent: ID %d\n", responseID)
+		fmt.Printf("Response sent: ID %d\n", newPlayer.ID)
 	}
-}
-
-func CreateClient(w http.ResponseWriter, r *http.Request) {
-	client := models.Client{
-		ID:        0,
-		IPAddress: r.RemoteAddr,
-	}
-
-	fmt.Printf("Client created %v", client)
 }
