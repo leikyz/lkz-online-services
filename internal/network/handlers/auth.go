@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"bytes"
+	"encoding/binary"
 	"fmt"
 	"io"
 	"net/http"
@@ -8,35 +10,36 @@ import (
 	client "github.com/leikyz/lkz-online-services/internal/clients"
 )
 
-func SayHello(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Hello request received")
+type ConnectClientRequest struct {
+	MessageID uint8
+}
 
+func ConnectClient(w http.ResponseWriter, r *http.Request) {
+
+	// Read data
 	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		fmt.Println("Read error :", err)
-		w.WriteHeader(http.StatusInternalServerError)
+	if err != nil || len(body) == 0 {
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	defer r.Body.Close()
 
-	if len(body) == 0 {
-		fmt.Println("Empty body received")
-		return
-	}
+	// Deserialize
+	reader := bytes.NewReader(body)
+	var req ConnectClientRequest
 
-	messageID := body[0]
-	fmt.Printf("Message received ! ID: %d | Size: %d bytes\n", messageID, len(body))
+	// Read data according buffer order
+	binary.Read(reader, binary.LittleEndian, &req.MessageID)
 
-	newPlayer := client.ClientManager.CreateClient("guest", 1)
+	fmt.Printf("ID: %d", req.MessageID)
 
-	responseID := byte(1)
+	// Create client
+	client.ClientManager.CreateClient("guest", 1)
+
+	buf := new(bytes.Buffer)
+	binary.Write(buf, binary.LittleEndian, uint8(1))
+
+	// Send to client
 	w.Header().Set("Content-Type", "application/octet-stream")
-
-	_, err = w.Write([]byte{responseID})
-
-	if err != nil {
-		fmt.Println("Error writing response:", err)
-	} else {
-		fmt.Printf("Response sent: ID %d\n", newPlayer.ID)
-	}
+	w.Write(buf.Bytes())
 }
