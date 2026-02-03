@@ -1,7 +1,6 @@
 package client
 
 import (
-	"fmt"
 	"sync"
 
 	"github.com/google/uuid"
@@ -9,7 +8,7 @@ import (
 
 type Manager struct {
 	clients map[string]*Client
-	sync.RWMutex
+	mu      sync.RWMutex
 }
 
 var ClientManager = &Manager{
@@ -17,20 +16,27 @@ var ClientManager = &Manager{
 }
 
 func (m *Manager) CreateClient(username string, level int) *Client {
-	m.Lock()
-	defer m.Unlock()
+	m.mu.Lock()
+	defer m.mu.Unlock()
 
-	client := &Client{
+	c := &Client{
 		ID:       uuid.New().String(),
 		Username: username,
 		Level:    level,
 	}
+	m.clients[c.ID] = c
+	return c
+}
 
-	client.ID = uuid.New().String()
+func (m *Manager) RemoveClient(id string) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	delete(m.clients, id)
+}
 
-	fmt.Printf("Creating client: %+v\n", client.ID)
-
-	m.clients[client.ID] = client
-	return client
-
+func (m *Manager) GetByID(id string) (*Client, bool) {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	c, ok := m.clients[id]
+	return c, ok
 }

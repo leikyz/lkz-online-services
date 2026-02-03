@@ -1,23 +1,33 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
+	"crypto/tls"
+	"log"
 
 	"github.com/leikyz/lkz-online-services/internal/network"
 )
 
 func main() {
-	mux := http.NewServeMux()
-	network.RegisterHandlers(mux)
+	network.InitBackendConnect("127.0.0.1:8081")
 
-	fmt.Println("LKZ Online Services Starting on :8080... 🚀")
-	fmt.Println("Listening for HTTP/2 (TCP)")
-
-	// Serve HTTP/2 with TLS
-	err := http.ListenAndServeTLS(":8080", ".local/certs/cert.crt", ".local/certs/cert.key", mux)
-
+	cert, err := tls.LoadX509KeyPair(".local/certs/cert.crt", ".local/certs/cert.key")
 	if err != nil {
-		fmt.Println("TCP Server Error:", err)
+		log.Fatal(err)
+	}
+
+	config := &tls.Config{Certificates: []tls.Certificate{cert}}
+	ln, err := tls.Listen("tcp", ":8080", config)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("Serveur Gateway TCP/TLS actif sur :8080 🚀")
+
+	for {
+		conn, err := ln.Accept()
+		if err != nil {
+			continue
+		}
+		go network.HandleConnection(conn)
 	}
 }
