@@ -1,10 +1,11 @@
-package messages
+package approach
 
 import (
+	"fmt"
 	"io"
 	"net"
 
-	client "github.com/leikyz/lkz-online-services/internal/registries"
+	"github.com/leikyz/lkz-online-services/internal/registries"
 )
 
 type CreateClientMessage struct {
@@ -28,10 +29,14 @@ func (m *CreateClientMessage) Deserialize(reader io.Reader) error {
 }
 
 func (m *CreateClientMessage) Process(conn net.Conn) error {
-	_ = client.Clients.CreateClient("Guest", 0)
 
+	newClient := registries.Clients.CreateClient("Guest", 0)
 	data, _ := m.Serialize()
 	_, err := conn.Write(data)
+
+	if err == nil {
+		fmt.Printf("Client created successfuly: %s\n", newClient.ID)
+	}
 
 	return err
 }

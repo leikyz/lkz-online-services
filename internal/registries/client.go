@@ -12,8 +12,10 @@ type Manager struct {
 	mu      sync.RWMutex
 }
 
+// Clients registry instance
 var Clients = &Manager{clients: make(map[string]*models.Client)}
 
+// Creates a new client and adds it to the registry
 func (m *Manager) CreateClient(username string, level int) *models.Client {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -27,12 +29,14 @@ func (m *Manager) CreateClient(username string, level int) *models.Client {
 	return c
 }
 
+// Removes a client from the registry by ID
 func (m *Manager) RemoveClient(id string) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	delete(m.clients, id)
 }
 
+// Retrieves a client by ID
 func (m *Manager) GetByID(id string) (*models.Client, bool) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()

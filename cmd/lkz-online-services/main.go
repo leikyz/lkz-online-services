@@ -1,33 +1,18 @@
 package main
 
 import (
-	"crypto/tls"
-	"log"
+	"fmt"
 
 	"github.com/leikyz/lkz-online-services/internal/network"
+	"github.com/leikyz/lkz-online-services/internal/network/messages/approach"
 )
 
 func main() {
-	network.InitBackendConnect("127.0.0.1:8081")
+	network.RegisterMessage(1, func() network.Message {
+		return approach.NewCreateClientMessage()
+	})
 
-	cert, err := tls.LoadX509KeyPair(".local/certs/cert.crt", ".local/certs/cert.key")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	config := &tls.Config{Certificates: []tls.Certificate{cert}}
-	ln, err := tls.Listen("tcp", ":8080", config)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Println("Serveur Gateway TCP/TLS actif sur :8080 🚀")
-
-	for {
-		conn, err := ln.Accept()
-		if err != nil {
-			continue
-		}
-		go network.HandleConnection(conn)
-	}
+	network.Initialization("127.0.0.1:8081")
+	fmt.Println("Serveur démarrée...")
+	select {}
 }
