@@ -4,7 +4,7 @@ import (
 	"io"
 	"net"
 
-	client "github.com/leikyz/lkz-online-services/internal/clients"
+	client "github.com/leikyz/lkz-online-services/internal/registries"
 )
 
 type CreateClientMessage struct {
@@ -28,8 +28,7 @@ func (m *CreateClientMessage) Deserialize(reader io.Reader) error {
 }
 
 func (m *CreateClientMessage) Process(conn net.Conn) error {
-	// Utilisation de _ car on n'a pas besoin de manipuler l'objet client ici
-	_ = client.ClientManager.CreateClient("Guest", 0)
+	_ = client.Clients.CreateClient("Guest", 0)
 
 	data, _ := m.Serialize()
 	_, err := conn.Write(data)

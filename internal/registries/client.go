@@ -1,25 +1,24 @@
-package client
+package registries
 
 import (
 	"sync"
 
 	"github.com/google/uuid"
+	"github.com/leikyz/lkz-online-services/internal/models"
 )
 
 type Manager struct {
-	clients map[string]*Client
+	clients map[string]*models.Client
 	mu      sync.RWMutex
 }
 
-var ClientManager = &Manager{
-	clients: make(map[string]*Client),
-}
+var Clients = &Manager{clients: make(map[string]*models.Client)}
 
-func (m *Manager) CreateClient(username string, level int) *Client {
+func (m *Manager) CreateClient(username string, level int) *models.Client {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	c := &Client{
+	c := &models.Client{
 		ID:       uuid.New().String(),
 		Username: username,
 		Level:    level,
@@ -34,7 +33,7 @@ func (m *Manager) RemoveClient(id string) {
 	delete(m.clients, id)
 }
 
-func (m *Manager) GetByID(id string) (*Client, bool) {
+func (m *Manager) GetByID(id string) (*models.Client, bool) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 	c, ok := m.clients[id]

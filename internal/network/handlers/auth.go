@@ -5,8 +5,8 @@ import (
 	"io"
 	"net"
 
-	client "github.com/leikyz/lkz-online-services/internal/clients"
 	"github.com/leikyz/lkz-online-services/internal/network"
+	"github.com/leikyz/lkz-online-services/internal/registries"
 )
 
 func HandleConnectClient(conn net.Conn, reader io.Reader) error {
@@ -15,7 +15,7 @@ func HandleConnectClient(conn net.Conn, reader io.Reader) error {
 		return err
 	}
 
-	client.ClientManager.CreateClient("TCP_Player", int(level))
+	registries.ClientManager.CreateClient("TCP_Player", int(level))
 
 	backendMsg := make([]byte, 5)
 	backendMsg[0] = 0x99
