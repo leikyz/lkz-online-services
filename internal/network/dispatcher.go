@@ -11,6 +11,7 @@ type Message interface {
 	Serialize() ([]byte, error)
 	Deserialize(reader io.Reader) error
 	Process(conn net.Conn) error
+	GetMessageSize() uint16
 }
 
 var registry = make(map[uint8]func() Message)
