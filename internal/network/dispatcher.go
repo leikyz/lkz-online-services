@@ -34,7 +34,7 @@ func HandleMessage(conn net.Conn) {
             break 
         }
         msgID := idBuf[2]
- fmt.Printf("Message ID : %d\n", msgID)
+        fmt.Printf("Message ID : %d\n", msgID)
         factory, ok := registry[msgID]
         if !ok {
             fmt.Printf("Message ID inconnu : %d\n", msgID)

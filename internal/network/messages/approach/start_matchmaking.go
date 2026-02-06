@@ -4,9 +4,8 @@ import (
 	"encoding/binary"
 	"io"
 	"net"
-
+"fmt"
 	"github.com/leikyz/lkz-online-services/internal/models"
-	"github.com/leikyz/lkz-online-services/internal/registries"
 )
 
 type StartMatchmakingMessage struct {
@@ -34,13 +33,11 @@ func (m *StartMatchmakingMessage) Deserialize(reader io.Reader) error {
 }
 
 func (m *StartMatchmakingMessage) Process(c *models.Client, conn net.Conn) (*models.Client, error) {
-
-	registries.Matchmaking.AddClientToQueue(c)
+   	registries.Matchmaking.AddClientToQueue(c)
 	data, _ := m.Serialize()
 	_, err := conn.Write(data)
 
-	return c, err
-}
+	return c, err}
 
 func (m *StartMatchmakingMessage) GetMessageSize() uint16 {
 	return uint16(binary.Size(m) + 2)

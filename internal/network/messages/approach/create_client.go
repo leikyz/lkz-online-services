@@ -7,8 +7,6 @@ import (
 	"net"
 
 	"github.com/leikyz/lkz-online-services/internal/models"
-	"github.com/leikyz/lkz-online-services/internal/network"
-	"github.com/leikyz/lkz-online-services/internal/registries"
 )
 
 type CreateClientMessage struct {
@@ -36,9 +34,13 @@ func (m *CreateClientMessage) Deserialize(reader io.Reader) error {
 }
 
 func (m *CreateClientMessage) Process(c *models.Client, conn net.Conn) (*models.Client, error) {
-    // Create a new client
-    // Use registries.Clients (should be initialized)
-    newClient := registries.Clients.CreateClient("Guest", 1, conn)
+    // Create a new client object
+    newClient := &models.Client{
+        ID:       fmt.Sprintf("Guest-%d", 1),
+        Username: "Guest",
+        Level:    1,
+        Conn:     conn,
+    }
     
     // Prepare response packet
     data, err := m.Serialize()
@@ -47,19 +49,12 @@ func (m *CreateClientMessage) Process(c *models.Client, conn net.Conn) (*models.
     }
 
     // Send response to the connected client
-    // Use 'conn' or 'newClient.Conn' as appropriate
     _, err = conn.Write(data)
     if err != nil {
         return nil, err
     }
 
     fmt.Printf("Client created successfully: %s\n", newClient.ID)
-
-    // Optionally forward to UDP server if needed
-    // Ensure network.Client is not nil before sending
-    if network.Client != nil {
-        network.Client.Send(data)
-    }
 
     return newClient, nil 
 }

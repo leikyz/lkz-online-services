@@ -3,9 +3,9 @@ package models
 import "sync"
 
 type Lobby struct {
-    ID      string            // Ou uint32 selon ta préférence
-    Clients []*Client         // Slice de pointeurs pour éviter les copies
-    Mu      sync.RWMutex      // Protection pour les accès concurrents
+    ID      string           
+    Clients []*Client         
+    Mu      sync.RWMutex      
 	
 }
 

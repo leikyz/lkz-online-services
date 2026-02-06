@@ -9,17 +9,18 @@ import (
 )
 
 func main() {
-	network.RegisterMessage(1, func() network.Message {
-		return approach.NewCreateClientMessage()
-	})
+    network.RegisterMessage(1, func() network.Message { return approach.NewCreateClientMessage() })
+    network.RegisterMessage(4, func() network.Message { return approach.NewStartMatchmakingMessage() })
 
-	network.RegisterMessage(4, func() network.Message {
-		return approach.NewStartMatchmakingMessage()
-	})
+    if registries.Matchmaking == nil {
+        fmt.Println("Erreur: Registre Matchmaking non initialisé")
+    }
+    go registries.Matchmaking.Start() 
+    
+    fmt.Println("Services démarrés...")
 
-	network.Initialization("127.0.0.1:8081")
-	fmt.Println("Serveur démarrée...")
-
-	registries.Matchmaking.Start()
+    fmt.Println("Serveur en attente sur 127.0.0.1:8081...")
+    network.Initialization("127.0.0.1:8081")
+	
 	select {}		
 }

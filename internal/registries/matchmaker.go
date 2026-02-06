@@ -6,6 +6,7 @@ import (
     "fmt"
 
 	"github.com/leikyz/lkz-online-services/internal/models"
+    "github.com/leikyz/lkz-online-services/internal/network/messages/lobbies"
 )
 
 type Matchmaker struct {
@@ -63,6 +64,12 @@ func (m *Matchmaker) FindMatches() {
         newLobby.Mu.Unlock()
         fmt.Printf("Client %s added to new lobby %s\n", client.ID, newLobby.ID)
     }
+
+
+    msg := lobbies.NewJoinLobbyMessage(1)
+    data, _ := msg.Serialize()
+    client.Conn.Write(data)
+
 }
 
 func (m *Matchmaker) Start() {
