@@ -6,6 +6,7 @@ import (
 	"io"
 	"net"
 
+	"github.com/leikyz/lkz-online-services/internal/models"
 	"github.com/leikyz/lkz-online-services/internal/network"
 	"github.com/leikyz/lkz-online-services/internal/registries"
 )
@@ -34,20 +35,35 @@ func (m *CreateClientMessage) Deserialize(reader io.Reader) error {
 	return nil
 }
 
-func (m *CreateClientMessage) Process(conn net.Conn) error {
+func (m *CreateClientMessage) Process(c *models.Client, conn net.Conn) (*models.Client, error) {
+    // Create a new client
+    // Use registries.Clients (should be initialized)
+    newClient := registries.Clients.CreateClient("Guest", 1, conn)
+    
+    // Prepare response packet
+    data, err := m.Serialize()
+    if err != nil {
+        return nil, err
+    }
 
-	newClient := registries.Clients.CreateClient("Guest", 0)
-	data, _ := m.Serialize()
-	_, err := conn.Write(data)
+    // Send response to the connected client
+    // Use 'conn' or 'newClient.Conn' as appropriate
+    _, err = conn.Write(data)
+    if err != nil {
+        return nil, err
+    }
 
-	if err == nil {
-		fmt.Printf("Client created successfuly: %s\n", newClient.ID)
-	}
+    fmt.Printf("Client created successfully: %s\n", newClient.ID)
 
-	network.Client.Send(data)
+    // Optionally forward to UDP server if needed
+    // Ensure network.Client is not nil before sending
+    if network.Client != nil {
+        network.Client.Send(data)
+    }
 
-	return err
+    return newClient, nil 
 }
+
 
 func (m *CreateClientMessage) GetMessageSize() uint16 {
 	return uint16(binary.Size(m) + 2)
