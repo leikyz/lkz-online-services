@@ -37,7 +37,6 @@ func (m *Matchmaker) FindMatches() {
 	m.mu.Unlock()
 
 	var lobby *models.Lobby
-
 	// Find a lobby suitable for this client
 	Lobbies.mu.RLock()
 	for _, lobbyCreated := range Lobbies.lobbies {
@@ -70,14 +69,31 @@ func (m *Matchmaker) FindMatches() {
 	}
 
 	if lobby != nil {
-		for _, client := range lobby.Clients {
-			// Ton code ici
-			msg := lobbies.NewJoinLobbyMessage(2)
-			data, _ := msg.Serialize()
-			client.Conn.Write(data)
+		// We get the new client index
+		var newClientIndex int
+		for i, c := range lobby.Clients {
+			if c == clientInComming {
+				newClientIndex = i
+				break
+			}
+		}
+
+		for i, client := range lobby.Clients {
+			if client == clientInComming {
+				msg := lobbies.NewJoinLobbyMessage(uint8(i))
+				data, _ := msg.Serialize()
+				client.Conn.Write(data)
+			} else {
+				msg := lobbies.NewJoinLobbyMessage(uint8(newClientIndex))
+				data, _ := msg.Serialize()
+				client.Conn.Write(data)
+
+				msgOld := lobbies.NewJoinLobbyMessage(uint8(i))
+				dataOld, _ := msgOld.Serialize()
+				clientInComming.Conn.Write(dataOld)
+			}
 		}
 	}
-
 }
 
 func (m *Matchmaker) Start() {

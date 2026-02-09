@@ -1,8 +1,9 @@
 package registries
 
 import (
+	"net"
 	"sync"
-"net"
+
 	"github.com/google/uuid"
 	"github.com/leikyz/lkz-online-services/internal/models"
 )
@@ -29,6 +30,7 @@ func (m *ClientManager) CreateClient(username string, level int, conn net.Conn) 
 	m.clients[c.ID] = c
 	return c
 }
+
 // Remove removes a client from the internal map by ID
 func (m *ClientManager) Remove(id string) {
 	m.mu.Lock()         // Lock for write access
@@ -39,6 +41,7 @@ func (m *ClientManager) Remove(id string) {
 		delete(m.clients, id)
 	}
 }
+
 // Removes a client from the registry by ID
 func (m *ClientManager) RemoveClient(id string) {
 	m.mu.Lock()
