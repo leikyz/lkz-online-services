@@ -68,6 +68,8 @@ func (m *Matchmaker) FindMatches() {
 		fmt.Printf("Client %s added to new lobby %s\n", clientInComming.ID, lobby.ID)
 	}
 
+	clientInComming.Lobby = lobby
+
 	if lobby != nil {
 		// We get the new client index
 		var newClientIndex int

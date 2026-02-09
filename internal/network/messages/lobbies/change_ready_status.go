@@ -1,6 +1,7 @@
 package lobbies
 
 import (
+	"bytes"
 	"encoding/binary"
 	"io"
 	"net"
@@ -23,12 +24,24 @@ func (m *ChangeReadyStatusMessage) GetID() uint8 {
 }
 
 func (m *ChangeReadyStatusMessage) Serialize() ([]byte, error) {
-	data := make([]byte, 4)
-	data[0] = byte(m.GetMessageSize() >> 8)
-	data[1] = byte(m.GetMessageSize() & 0xFF)
-	data[2] = m.ID
-	data[3] = m.PositionInLobby
-	return data, nil
+	buf := new(bytes.Buffer)
+	buf.Grow(5)
+
+	binary.Write(buf, binary.BigEndian, uint16(m.GetMessageSize()))
+	buf.WriteByte(m.ID)
+
+	var isReady uint8
+
+	if m.IsReady {
+		isReady = 1
+	} else {
+		isReady = 0
+	}
+
+	buf.WriteByte(isReady)
+	buf.WriteByte(m.PositionInLobby)
+
+	return buf.Bytes(), nil
 }
 
 func (m *ChangeReadyStatusMessage) Deserialize(reader io.Reader) error {
@@ -36,6 +49,19 @@ func (m *ChangeReadyStatusMessage) Deserialize(reader io.Reader) error {
 }
 
 func (m *ChangeReadyStatusMessage) Process(c *models.Client, conn net.Conn) (*models.Client, error) {
+
+	if c.Lobby == nil {
+		return c, nil
+	}
+
+	c.Ready = !c.Ready
+
+	for i, client := range c.Lobby.Clients {
+		message := NewChangeReadyStatusMessage(c.Ready, uint8(i))
+		data, _ := message.Serialize()
+		client.Conn.Write(data)
+	}
+
 	return c, nil
 }
 
