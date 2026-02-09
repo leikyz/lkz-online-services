@@ -56,10 +56,27 @@ func (m *ChangeReadyStatusMessage) Process(c *models.Client, conn net.Conn) (*mo
 
 	c.Ready = !c.Ready
 
+	var isEveryonReady bool = true
+
 	for i, client := range c.Lobby.Clients {
+
+		if !client.Ready {
+			isEveryonReady = false
+		}
+
 		message := NewChangeReadyStatusMessage(c.Ready, uint8(i))
 		data, _ := message.Serialize()
 		client.Conn.Write(data)
+	}
+
+	// If everyon is ready, we send StartGame message to all
+	if isEveryonReady {
+		message := NewSWaitingForSessionMessage()
+		data, _ := message.Serialize()
+
+		for _, client := range c.Lobby.Clients {
+			client.Conn.Write(data)
+		}
 	}
 
 	return c, nil

@@ -12,7 +12,7 @@ type StartGameMessage struct {
 	ID uint8
 }
 
-func NewStartMatchmakingMessage() *StartGameMessage {
+func NewStartGameMessage() *StartGameMessage {
 	return &StartGameMessage{ID: 5}
 }
 

@@ -13,6 +13,8 @@ func main() {
 	network.RegisterMessage(1, func() network.Message { return approach.NewCreateClientMessage() })
 	network.RegisterMessage(4, func() network.Message { return approach.NewStartMatchmakingMessage() })
 	network.RegisterMessage(6, func() network.Message { return lobbies.NewChangeReadyStatusMessage(false, 0) })
+	network.RegisterMessage(6, func() network.Message { return lobbies.NewSWaitingForSessionMessage() })
+
 	if registries.Matchmaking == nil {
 		fmt.Println("Erreur: Registre Matchmaking non initialisé")
 	}
