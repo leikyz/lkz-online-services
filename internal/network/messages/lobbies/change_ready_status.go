@@ -69,7 +69,7 @@ func (m *ChangeReadyStatusMessage) Process(c *models.Client, conn net.Conn) (*mo
 		client.Conn.Write(data)
 	}
 
-	// If everyon is ready, we send StartGame message to all
+	// If everyone is ready, we send StartGame message to all
 	if isEveryonReady {
 		message := NewSWaitingForSessionMessage()
 		data, _ := message.Serialize()

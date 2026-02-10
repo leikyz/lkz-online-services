@@ -2,11 +2,11 @@ package approach
 
 import (
 	"encoding/binary"
-	"fmt"
 	"io"
 	"net"
 
 	"github.com/leikyz/lkz-online-services/internal/models"
+	"github.com/leikyz/lkz-online-services/internal/registries"
 )
 
 type CreateClientMessage struct {
@@ -34,32 +34,20 @@ func (m *CreateClientMessage) Deserialize(reader io.Reader) error {
 }
 
 func (m *CreateClientMessage) Process(c *models.Client, conn net.Conn) (*models.Client, error) {
-    // Create a new client object
-    newClient := &models.Client{
-        ID:       fmt.Sprintf("Guest-%d", 1),
-        Username: "Guest",
-        Level:    1,
-        Conn:     conn,
-    }
-    
-    // Prepare response packet
-    data, err := m.Serialize()
-    if err != nil {
-        return nil, err
-    }
+	clientPtr := registries.Clients.CreateClient("guest", 1, conn)
 
-    // Send response to the connected client
-    _, err = conn.Write(data)
-    if err != nil {
-        return nil, err
-    }
+	data, err := m.Serialize()
+	if err != nil {
+		return nil, err
+	}
 
-    fmt.Printf("Client created successfully: %s\n", newClient.ID)
+	_, err = conn.Write(data)
+	if err != nil {
+		return nil, err
+	}
 
-    return newClient, nil 
+	return clientPtr, nil
 }
-
-
 func (m *CreateClientMessage) GetMessageSize() uint16 {
 	return uint16(binary.Size(m) + 2)
 }
