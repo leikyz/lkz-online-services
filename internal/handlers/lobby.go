@@ -23,16 +23,9 @@ func HandleCreateClient(msg *approach.CreateClientMessage, c *models.Client, con
 
 	clientPtr := registries.Clients.CreateClient("guest", 1, conn)
 
-	data, err := msg.Serialize()
-	if err != nil {
-		return nil, fmt.Errorf("failed to serialize response: %v", err)
-	}
-
-	fmt.Printf("Serialized CreateClientMessage: %v\n", data)
-	_, err = conn.Write(data)
-	if err != nil {
-		return nil, fmt.Errorf("failed to send response: %v", err)
-	}
+	message := approach.NewWelcomeMessage(clientPtr.ID)
+	data, _ := message.Serialize()
+	c.Conn.Write(data)
 
 	return clientPtr, nil
 }
