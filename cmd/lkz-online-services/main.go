@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/leikyz/lkz-online-services/internal/handlers"
 	"github.com/leikyz/lkz-online-services/internal/network"
 	"github.com/leikyz/lkz-online-services/internal/network/messages/approach"
 	"github.com/leikyz/lkz-online-services/internal/network/messages/lobbies"
@@ -10,10 +11,10 @@ import (
 )
 
 func main() {
-	network.RegisterMessage(1, func() network.Message { return approach.NewCreateClientMessage() })
-	network.RegisterMessage(4, func() network.Message { return approach.NewStartMatchmakingMessage() })
-	network.RegisterMessage(6, func() network.Message { return lobbies.NewChangeReadyStatusMessage(false, 0) })
-	network.RegisterMessage(6, func() network.Message { return lobbies.NewSWaitingForSessionMessage() })
+
+	network.Register(1, func() network.Message { return approach.NewCreateClientMessage() }, network.Bind(handlers.HandleCreateClient))
+	network.Register(4, func() network.Message { return &approach.StartMatchmakingMessage{} }, network.Bind(handlers.HandleStartMatchmaking))
+	network.Register(6, func() network.Message { return &lobbies.ChangeReadyStatusMessage{} }, network.Bind(handlers.HandleChangeReadyStatus))
 
 	if registries.Matchmaking == nil {
 		fmt.Println("Erreur: Registre Matchmaking non initialisé")

@@ -17,7 +17,7 @@ type SessionManager struct {
 var Sessions = &SessionManager{sessions: make(map[uint32]*models.Session)}
 
 // Creates a new Session and adds it to the registry
-func (m *SessionManager) CreateSession(id int, lobby *models.Lobby) *models.Session {
+func (m *SessionManager) CreateSession(lobby *models.Lobby) *models.Session {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 

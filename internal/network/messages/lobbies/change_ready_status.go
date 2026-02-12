@@ -4,9 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"io"
-	"net"
-
-	"github.com/leikyz/lkz-online-services/internal/models"
 )
 
 type ChangeReadyStatusMessage struct {
@@ -46,40 +43,6 @@ func (m *ChangeReadyStatusMessage) Serialize() ([]byte, error) {
 
 func (m *ChangeReadyStatusMessage) Deserialize(reader io.Reader) error {
 	return nil
-}
-
-func (m *ChangeReadyStatusMessage) Process(c *models.Client, conn net.Conn) (*models.Client, error) {
-
-	if c.Lobby == nil {
-		return c, nil
-	}
-
-	c.Ready = !c.Ready
-
-	var isEveryonReady bool = true
-
-	for i, client := range c.Lobby.Clients {
-
-		if !client.Ready {
-			isEveryonReady = false
-		}
-
-		message := NewChangeReadyStatusMessage(c.Ready, uint8(i))
-		data, _ := message.Serialize()
-		client.Conn.Write(data)
-	}
-
-	// If everyone is ready, we send StartGame message to all
-	if isEveryonReady {
-		message := NewSWaitingForSessionMessage()
-		data, _ := message.Serialize()
-
-		for _, client := range c.Lobby.Clients {
-			client.Conn.Write(data)
-		}
-	}
-
-	return c, nil
 }
 
 func (m *ChangeReadyStatusMessage) GetMessageSize() uint16 {

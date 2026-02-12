@@ -3,13 +3,10 @@ package lobbies
 import (
 	"encoding/binary"
 	"io"
-	"net"
-
-	"github.com/leikyz/lkz-online-services/internal/models"
 )
 
 type JoinLobbyMessage struct {
-	ID uint8
+	ID              uint8
 	PositionInLobby uint8
 }
 
@@ -32,10 +29,6 @@ func (m *JoinLobbyMessage) Serialize() ([]byte, error) {
 
 func (m *JoinLobbyMessage) Deserialize(reader io.Reader) error {
 	return nil
-}
-
-func (m *JoinLobbyMessage) Process(c *models.Client, conn net.Conn) (*models.Client, error) {
-    return c, nil
 }
 
 func (m *JoinLobbyMessage) GetMessageSize() uint16 {

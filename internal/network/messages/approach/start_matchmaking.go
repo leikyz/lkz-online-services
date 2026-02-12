@@ -3,10 +3,6 @@ package approach
 import (
 	"encoding/binary"
 	"io"
-	"net"
-
-	"github.com/leikyz/lkz-online-services/internal/models"
-	"github.com/leikyz/lkz-online-services/internal/registries"
 )
 
 type StartMatchmakingMessage struct {
@@ -31,12 +27,6 @@ func (m *StartMatchmakingMessage) Serialize() ([]byte, error) {
 
 func (m *StartMatchmakingMessage) Deserialize(reader io.Reader) error {
 	return nil
-}
-
-func (m *StartMatchmakingMessage) Process(c *models.Client, conn net.Conn) (*models.Client, error) {
-
-	registries.Matchmaking.AddClientToQueue(c)
-	return c, nil
 }
 
 func (m *StartMatchmakingMessage) GetMessageSize() uint16 {

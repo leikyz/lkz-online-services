@@ -3,9 +3,6 @@ package lobbies
 import (
 	"encoding/binary"
 	"io"
-	"net"
-
-	"github.com/leikyz/lkz-online-services/internal/models"
 )
 
 type StartGameMessage struct {
@@ -30,10 +27,6 @@ func (m *StartGameMessage) Serialize() ([]byte, error) {
 
 func (m *StartGameMessage) Deserialize(reader io.Reader) error {
 	return nil
-}
-
-func (m *StartGameMessage) Process(c *models.Client, conn net.Conn) (*models.Client, error) {
-	return c, nil
 }
 
 func (m *StartGameMessage) GetMessageSize() uint16 {

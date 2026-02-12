@@ -1,4 +1,4 @@
-package lobbies
+package sessions
 
 import (
 	"bytes"
@@ -16,9 +16,12 @@ type CreateSessionMessage struct {
 	ClientAllowedIDs []uint32 // Liste des IDs autorisés à rejoindre
 }
 
-func NewCreateSessionMessage() *CreateSessionMessage {
+func NewCreateSessionMessage(token uint32, clientIDs []uint32) *CreateSessionMessage {
 	return &CreateSessionMessage{
-		ID: 26,
+		ID:               26,
+		Token:            token,
+		ClientIdsCount:   uint8(len(clientIDs)),
+		ClientAllowedIDs: clientIDs,
 	}
 }
 

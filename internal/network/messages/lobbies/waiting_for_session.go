@@ -3,9 +3,6 @@ package lobbies
 import (
 	"encoding/binary"
 	"io"
-	"net"
-
-	"github.com/leikyz/lkz-online-services/internal/models"
 )
 
 type WaitingForSessionMessage struct {
@@ -30,10 +27,6 @@ func (m *WaitingForSessionMessage) Serialize() ([]byte, error) {
 
 func (m *WaitingForSessionMessage) Deserialize(reader io.Reader) error {
 	return nil
-}
-
-func (m *WaitingForSessionMessage) Process(c *models.Client, conn net.Conn) (*models.Client, error) {
-	return c, nil
 }
 
 func (m *WaitingForSessionMessage) GetMessageSize() uint16 {

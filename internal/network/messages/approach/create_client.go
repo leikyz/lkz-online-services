@@ -3,10 +3,6 @@ package approach
 import (
 	"encoding/binary"
 	"io"
-	"net"
-
-	"github.com/leikyz/lkz-online-services/internal/models"
-	"github.com/leikyz/lkz-online-services/internal/registries"
 )
 
 type CreateClientMessage struct {
@@ -33,21 +29,6 @@ func (m *CreateClientMessage) Deserialize(reader io.Reader) error {
 	return nil
 }
 
-func (m *CreateClientMessage) Process(c *models.Client, conn net.Conn) (*models.Client, error) {
-	clientPtr := registries.Clients.CreateClient("guest", 1, conn)
-
-	data, err := m.Serialize()
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = conn.Write(data)
-	if err != nil {
-		return nil, err
-	}
-
-	return clientPtr, nil
-}
 func (m *CreateClientMessage) GetMessageSize() uint16 {
 	return uint16(binary.Size(m) + 2)
 }
