@@ -54,6 +54,7 @@ func HandleChangeReadyStatus(msg *lobbies.ChangeReadyStatusMessage, c *models.Cl
 		client.Conn.Write(data)
 	}
 
+	// Send to
 	if isEveryonReady {
 		session := registries.Sessions.CreateSession(c.Lobby)
 		var allowedIDs []uint32
@@ -66,6 +67,12 @@ func HandleChangeReadyStatus(msg *lobbies.ChangeReadyStatusMessage, c *models.Cl
 		data, _ := startGameMsg.Serialize()
 
 		network.Client.Send(data)
+
+		for _, client := range c.Lobby.Clients {
+			joinSessionMsg := sessions.NewSessionAssignmentMessage(session.ID)
+			data, _ := joinSessionMsg.Serialize()
+			client.Conn.Write(data)
+		}
 	}
 
 	return c, nil

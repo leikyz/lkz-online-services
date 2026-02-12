@@ -4,9 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"io"
-	"net"
-
-	"github.com/leikyz/lkz-online-services/internal/models"
 )
 
 type CreateSessionMessage struct {
@@ -57,8 +54,4 @@ func (m *CreateSessionMessage) GetMessageSize() uint16 {
 	dynamicValue := uint16(len(m.ClientAllowedIDs) * 4)
 
 	return fixedValue + dynamicValue
-}
-
-func (m *CreateSessionMessage) Process(c *models.Client, conn net.Conn) (*models.Client, error) {
-	return c, nil
 }
