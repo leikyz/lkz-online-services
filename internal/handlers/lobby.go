@@ -25,7 +25,7 @@ func HandleCreateClient(msg *approach.CreateClientMessage, c *models.Client, con
 
 	message := approach.NewWelcomeMessage(clientPtr.ID)
 	data, _ := message.Serialize()
-	c.Conn.Write(data)
+	clientPtr.Conn.Write(data)
 
 	return clientPtr, nil
 }
