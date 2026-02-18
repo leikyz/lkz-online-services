@@ -38,16 +38,24 @@ func HandleChangeReadyStatus(msg *lobbies.ChangeReadyStatusMessage, c *models.Cl
 	c.Ready = !c.Ready
 	var isEveryonReady bool = true
 
-	for i, client := range c.Lobby.Clients {
-		if !client.Ready {
-			isEveryonReady = false
+	for senderIndex, client := range c.Lobby.Clients {
+		if client.ID == c.ID {
+			client.Ready = c.Ready
+
+			message := lobbies.NewChangeReadyStatusMessage(client.Ready, uint8(senderIndex))
+			data, _ := message.Serialize()
+
+			for _, clientToSend := range c.Lobby.Clients {
+
+				if !clientToSend.Ready {
+					isEveryonReady = false
+				}
+
+				clientToSend.Conn.Write(data)
+			}
 		}
-		message := lobbies.NewChangeReadyStatusMessage(client.Ready, uint8(i))
-		data, _ := message.Serialize()
-		client.Conn.Write(data)
 	}
 
-	// Send to
 	if isEveryonReady {
 		session := registries.Sessions.CreateSession(c.Lobby)
 		var allowedIDs []uint32
