@@ -15,6 +15,13 @@ func (l *Lobby) IsFull() bool {
 	return len(l.Clients) >= 4
 }
 
+func (l *Lobby) GetClientCount() int {
+	l.Mu.RLock()
+	defer l.Mu.RUnlock()
+
+	return len(l.Clients)
+}
+
 func (l *Lobby) IsAvailable(c *Client) bool {
 	l.Mu.RLock()
 	defer l.Mu.RUnlock()

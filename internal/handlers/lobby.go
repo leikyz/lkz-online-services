@@ -8,6 +8,7 @@ import (
 	"github.com/leikyz/lkz-online-services/internal/network"
 	"github.com/leikyz/lkz-online-services/internal/network/messages/approach"
 	"github.com/leikyz/lkz-online-services/internal/network/messages/lobbies"
+	"github.com/leikyz/lkz-online-services/internal/network/messages/metrics"
 	"github.com/leikyz/lkz-online-services/internal/network/messages/sessions"
 	"github.com/leikyz/lkz-online-services/internal/registries"
 )
@@ -28,6 +29,19 @@ func HandleCreateClient(msg *approach.CreateClientMessage, c *models.Client, con
 	clientPtr.Conn.Write(data)
 
 	return clientPtr, nil
+}
+
+func HandleClientInGameHandShake(msg *metrics.ClientInGameHandShakeMessage, c *models.Client, conn net.Conn) (*models.Client, error) {
+	fmt.Printf("Received in-game handshake from client %d\n", c.ID)
+
+	s, _ := registries.Sessions.GetByLobby(c.Lobby)
+
+	message := metrics.NewBackendMetricsMessage(c.Lobby.ID, uint16(c.Lobby.GetClientCount()), s.ID)
+	data, _ := message.Serialize()
+
+	c.Conn.Write(data)
+
+	return c, nil
 }
 
 func HandleChangeReadyStatus(msg *lobbies.ChangeReadyStatusMessage, c *models.Client, conn net.Conn) (*models.Client, error) {

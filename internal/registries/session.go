@@ -46,3 +46,16 @@ func (m *SessionManager) GetByID(id uint32) (*models.Session, bool) {
 	c, ok := m.sessions[id]
 	return c, ok
 }
+
+func (m *SessionManager) GetByLobby(lobby *models.Lobby) (*models.Session, bool) {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+
+	for _, session := range m.sessions {
+		if session.Lobby.ID == lobby.ID {
+			return session, true
+		}
+	}
+
+	return nil, false
+}
