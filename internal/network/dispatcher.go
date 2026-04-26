@@ -21,6 +21,7 @@ var MessageRegistry = make(map[uint8]func() Message)
 var HandlerRegistry = make(map[uint8]HandlerFunc)
 
 func Register(id uint8, factory func() Message, handler HandlerFunc) {
+	fmt.Printf("Registering Message ID: %d\n", id) // Verify this runs for 32
 	MessageRegistry[id] = factory
 	HandlerRegistry[id] = handler
 }

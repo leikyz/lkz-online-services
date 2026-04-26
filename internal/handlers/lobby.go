@@ -31,6 +31,27 @@ func HandleCreateClient(msg *approach.CreateClientMessage, c *models.Client, con
 	return clientPtr, nil
 }
 
+func HandlePingPong(msg *metrics.PingPongMessage, c *models.Client, conn net.Conn) (*models.Client, error) {
+	// Create a new response message
+	response := metrics.NewPingPongMessage()
+
+	// CRITICAL: Echo the sequence ID back to the client
+	response.SequenceID = msg.SequenceID
+
+	data, err := response.Serialize()
+	if err != nil {
+		return c, fmt.Errorf("ping serialization failed: %v", err)
+	}
+
+	// Use the client's connection to send it back
+	_, err = c.Conn.Write(data)
+	if err != nil {
+		return c, fmt.Errorf("failed to send ping response: %v", err)
+	}
+
+	return c, nil
+}
+
 func HandleClientInGameHandShake(msg *metrics.ClientInGameHandShakeMessage, c *models.Client, conn net.Conn) (*models.Client, error) {
 	fmt.Printf("Received in-game handshake from client %d\n", c.ID)
 

@@ -13,6 +13,8 @@ import (
 
 func main() {
 
+	fmt.Println("Starting registration...")
+
 	network.Register(1, func() network.Message { return approach.NewCreateClientMessage() }, network.Bind(handlers.HandleCreateClient))
 	network.Register(4, func() network.Message { return &approach.StartMatchmakingMessage{} }, network.Bind(handlers.HandleStartMatchmaking))
 	network.Register(6, func() network.Message { return &lobbies.ChangeReadyStatusMessage{} }, network.Bind(handlers.HandleChangeReadyStatus))
